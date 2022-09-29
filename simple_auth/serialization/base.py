@@ -1,51 +1,4 @@
-import datetime
-from typing import Any
-
-
-class Field:
-
-    def __init__(self, defaults: Any = None, max: int = 100,
-                 min: int = 0, required: bool = True, description: str = None
-                 ):
-        self.defaults = defaults
-        self.max = max
-        self.min = min
-        self.required = required
-        self.description = description
-        self.__verify_required()
-        self.__verify_max()
-        self.__verify_min()
-
-    def __get__(self, instance, value):
-        return self.defaults
-
-    def __set__(self, instance, value):
-        self.defaults = value
-        self.__verify_required()
-        self.__verify_max()
-        self.__verify_min()
-
-    def __verify_required(self):
-        if self.required and self.defaults is None:
-            raise TypeError(f'{self.description if self.description else self.__class__.__name__}不能为空')
-
-    def __verify_max(self):
-        if self.defaults is not None:
-            if not isinstance(self.defaults, int) and len(self.defaults) > self.max:
-                raise TypeError(f'{self.description if self.description else self.__class__.__name__}'
-                                f'不能大于{self.max}位')
-            elif len(str(self.defaults)) > self.max:
-                raise TypeError(f'{self.description if self.description else self.__class__.__name__}'
-                                f'不能大于{self.max}位')
-
-    def __verify_min(self):
-        if self.defaults is not None:
-            if not isinstance(self.defaults, int) and len(self.defaults) < self.min:
-                raise TypeError(f'{self.description if self.description else self.__class__.__name__}'
-                                f'不能小于{self.min}位')
-            elif len(str(self.defaults)) < self.min:
-                raise TypeError(f'{self.description if self.description else self.__class__.__name__}'
-                                f'不能小于{self.min}位')
+from simple_auth.field import Field
 
 
 class SerializationMetaclass(type):
@@ -128,34 +81,3 @@ class BaseSerialization(metaclass=SerializationMetaclass):
 
     def to_dict(self):
         return self.__to_dict
-
-
-class GetSerialization(BaseSerialization):
-    name: str = Field(defaults='', max=100, min=0, required=True, description='姓名')
-    age: int = Field(defaults=0, max=100, min=0, required=True, description='年龄')
-
-    def verification_name(self, value, values):
-
-        if value == '1':
-            raise ValueError('姓名不能为1')
-        return value
-
-
-class SetSerialization(GetSerialization):
-    a: str = Field(max=100, min=0, required=False)
-
-
-class PutSerialization(SetSerialization):
-    b: str = Field('10', max=100, min=0, required=True, description='B')
-
-
-class Put1Serialization(SetSerialization):
-    c: str = Field(max=100, min=0, required=False, description='C')
-
-
-# a = GetSerialization(**{'name': '小明', 'age': 1})
-start_data = datetime.datetime.now()
-a = GetSerialization(**{'name': '小明', 'age': 1, 'v': 2})
-print(a.to_dict())
-print(datetime.datetime.now()-start_data)
-
