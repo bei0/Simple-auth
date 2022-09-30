@@ -24,7 +24,6 @@ class SerializationMetaclass(type):
                     del namespace[key]
 
         for key, value in namespace.items():
-
             if key.startswith('verification_'):
                 args = key.split('_')[-1]
                 if args not in namespace.get('__annotations__'):
@@ -36,8 +35,9 @@ class SerializationMetaclass(type):
         return type.__new__(cls, name, bases, dict(namespace))
 
     def __call__(self, *args, **kwargs):
-
+        print(self.__dict__)
         for k, v in self.__dict__.get('__annotations__').items():
+            print(self.__dict__.get(k))
             if hasattr(self.__dict__.get(k), '__set__'):
                 if not isinstance(self.__dict__.get(k).__get__(self, k), v):
                     description = self.__dict__.get(k).description or k

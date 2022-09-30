@@ -1,5 +1,9 @@
 import datetime
+import typing
+from typing import List, Union
+
 from simple_auth.serialization import BaseSerialization, Field
+from simple_auth.serialization.instance import is_instance
 
 
 class GetSerialization(BaseSerialization):
@@ -13,20 +17,14 @@ class GetSerialization(BaseSerialization):
         return value
 
 
-class SetSerialization(GetSerialization):
-    a: str = Field(max=100, min=0, required=False)
-
-
-class PutSerialization(SetSerialization):
-    b: str = Field('10', max=100, min=0, required=True, description='B')
-
-
-class Put1Serialization(SetSerialization):
-    c: str = Field(max=100, min=0, required=False, description='C')
-
+class Put1Serialization(BaseSerialization):
+    c: Union[str, int] = Field('', max=100, min=0, required=False, description='C')
+    # a: List[GetSerialization] = Field([], max=100, min=0, required=False, description='A')
 
 # a = GetSerialization(**{'name': '小明', 'age': 1})
-start_data = datetime.datetime.now()
-a = GetSerialization(**{'name': '小明', 'age': 1, 'v': 2})
-print(a.to_dict())
-print(datetime.datetime.now()-start_data)
+# start_data = datetime.datetime.now()
+# a = Put1Serialization(**{'c': '小明'})
+# print(a.to_dict())
+# print(datetime.datetime.now()-start_data)
+a: str = 'a'
+print(is_instance(a, str))
